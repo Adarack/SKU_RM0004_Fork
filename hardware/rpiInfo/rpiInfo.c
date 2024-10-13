@@ -18,7 +18,7 @@
 #include <stdlib.h>
 
 /*
-* Get the IP address of wlan0 or eth0
+* Get the IP address of wlan0 or eth0 or end0
 */
 
 char* get_ip_address(void)
@@ -33,6 +33,25 @@ char* get_ip_address(void)
       ifr.ifr_addr.sa_family = AF_INET;
       /* I want IP address attached to "eth0" */
       strncpy(ifr.ifr_name, "eth0", IFNAMSIZ-1);
+      symbol=ioctl(fd, SIOCGIFADDR, &ifr);
+      close(fd);
+      if(symbol==0)
+      {
+        return inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);
+      }
+      else
+      {
+        char* buffer="xxx.xxx.xxx.xxx";
+        return buffer;
+      }
+    }
+    if (IPADDRESS_TYPE == END0_ADDRESS)
+    {
+      fd = socket(AF_INET, SOCK_DGRAM, 0);
+      /* I want to get an IPv4 IP address */
+      ifr.ifr_addr.sa_family = AF_INET;
+      /* I want IP address attached to "END0" */
+      strncpy(ifr.ifr_name, "end0", IFNAMSIZ-1);
       symbol=ioctl(fd, SIOCGIFADDR, &ifr);
       close(fd);
       if(symbol==0)
@@ -95,6 +114,17 @@ char* get_ip_address_new(void)
       ifr.ifr_addr.sa_family = AF_INET;
       /* I want IP address attached to "wlan0" */
       strncpy(ifr.ifr_name, "wlan0", IFNAMSIZ-1);
+      symbol=ioctl(fd, SIOCGIFADDR, &ifr);
+      close(fd);    
+      if(symbol==0)
+      {
+        return inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);   
+      }
+        fd = socket(AF_INET, SOCK_DGRAM, 0);
+      /* I want to get an IPv4 IP address */
+      ifr.ifr_addr.sa_family = AF_INET;
+      /* I want IP address attached to "end0" */
+      strncpy(ifr.ifr_name, "end0", IFNAMSIZ-1);
       symbol=ioctl(fd, SIOCGIFADDR, &ifr);
       close(fd);    
       if(symbol==0)
@@ -175,11 +205,11 @@ uint8_t get_hard_disk_memory(uint16_t *diskMemSize, uint16_t *useMemSize)
   uint8_t diskMembuff[10] = {0};
   uint8_t useMembuff[10] = {0};
   FILE *fd = NULL;
-  fd=popen("df -l | grep /dev/sda | awk '{printf \"%s\", $(2)}'","r"); 
+  fd=popen("df -l | grep /dev/sda2 | awk '{printf \"%s\", $(2)}'","r"); 
   fgets(diskMembuff,sizeof(diskMembuff),fd);
   fclose(fd);
 
-  fd=popen("df -l | grep /dev/sda | awk '{printf \"%s\", $(3)}'","r"); 
+  fd=popen("df -l | grep /dev/sda2 | awk '{printf \"%s\", $(3)}'","r"); 
   fgets(useMembuff,sizeof(useMembuff),fd);
   fclose(fd);
 
