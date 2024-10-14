@@ -45,25 +45,6 @@ char* get_ip_address(void)
         return buffer;
       }
     }
-    if (IPADDRESS_TYPE == END0_ADDRESS)
-    {
-      fd = socket(AF_INET, SOCK_DGRAM, 0);
-      /* I want to get an IPv4 IP address */
-      ifr.ifr_addr.sa_family = AF_INET;
-      /* I want IP address attached to "END0" */
-      strncpy(ifr.ifr_name, "end0", IFNAMSIZ-1);
-      symbol=ioctl(fd, SIOCGIFADDR, &ifr);
-      close(fd);
-      if(symbol==0)
-      {
-        return inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);
-      }
-      else
-      {
-        char* buffer="xxx.xxx.xxx.xxx";
-        return buffer;
-      }
-    }
     else if (IPADDRESS_TYPE == WLAN0_ADDRESS)
     {
         fd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -114,17 +95,6 @@ char* get_ip_address_new(void)
       ifr.ifr_addr.sa_family = AF_INET;
       /* I want IP address attached to "wlan0" */
       strncpy(ifr.ifr_name, "wlan0", IFNAMSIZ-1);
-      symbol=ioctl(fd, SIOCGIFADDR, &ifr);
-      close(fd);    
-      if(symbol==0)
-      {
-        return inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);   
-      }
-        fd = socket(AF_INET, SOCK_DGRAM, 0);
-      /* I want to get an IPv4 IP address */
-      ifr.ifr_addr.sa_family = AF_INET;
-      /* I want IP address attached to "end0" */
-      strncpy(ifr.ifr_name, "end0", IFNAMSIZ-1);
       symbol=ioctl(fd, SIOCGIFADDR, &ifr);
       close(fd);    
       if(symbol==0)
